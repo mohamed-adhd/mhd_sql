@@ -1,0 +1,5 @@
+.rodata
+
+;soon
+
+.text

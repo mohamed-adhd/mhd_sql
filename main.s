@@ -11,33 +11,36 @@ page_buf: resb 65536
 header_buf: resb 100
 temp: resb 144
 n:resq 1
+s: resq 1
 .text
 	mov rsi,0
 	mov rdi,[rsp+16]
 	mov rdx,0
 	mov rax,2
 	syscall;openin
-	mov ebx,rax
-	mov ecx,temp
-	push rax
-	mov rax,5
-	syscall
-	pop rax
 	
-	mov ebx,rax
-	mov ecx,temp
+
+	mov rdi,rax
+	mov rsi,temp
 	push rax
 	mov rax,5
-	syscall
-	pop rax
+	syscall; fstat call
+	mov rax,[temp +48]
+	push rax
+	
 
 	mov rdi,rax
 	mov rsi,header_buf
 	mov rdx,2
 	mov rcx,16
-	call readnbytes; so here it should start reading page by page till a page type bytes are 0x0D
+	call readnbytes; read the pages size
+	movzx rbx, byte [header_buf]
+	shl rbx, 8
+	movzx rax, byte [header_buf +1]
+	or rbx,rax;conversion from bigendian
+	
+	pop rax
 	xor rdx,rdx
-	mov rbx,[temp]
 	div rbx
 	mov [n],rax;we got da number of pages  
 	

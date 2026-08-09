@@ -10,9 +10,12 @@ align 8
 page_buf: resb 65536
 header_buf: resb 100
 temp: resb 144
+fd:resq 1
 n:resq 1
 s: resq 1
 i:resb 1
+cells_number: word 1
+cells
 page_type:resb 1
 .text
 	mov rsi,0
@@ -20,8 +23,8 @@ page_type:resb 1
 	mov rdx,0
 	mov rax,2
 	syscall;openin
+	mov [fd],rax
 	
-
 	mov rdi,rax
 	mov rsi,temp
 	push rax
@@ -30,7 +33,7 @@ page_type:resb 1
 	mov rax,[temp +48]
 	push rax
 	
-
+	
 	mov rdi,rax
 	mov rsi,header_buf
 	mov rdx,2
@@ -73,9 +76,26 @@ checkpage:
 	mov rcx,0
 	call readnbytes; read page
 	cmp [page_type],0x0D
+	je .we_got_a_nodder
+
+.we_got_a_nodder:
+	mov rdi,[fd]
+	mov rsi,cells_number
+	mov rdx,2
+	mov rcx,3
+	call readnbytes; read page
+	push rbx
+	push rax
+	mov rbx,rax
+	movzx rbx, byte [cells_number]
+	shl rbx, 8
+	movzx rax, byte [cells_number+1]
+	or rbx,rax;
+	pop rax
+	pop rbx
+
 	
-
-
+	
 	
 
 

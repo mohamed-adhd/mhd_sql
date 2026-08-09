@@ -13,6 +13,7 @@ temp: resb 144
 n:resq 1
 s: resq 1
 i:resb 1
+page_type:resb 1
 .text
 	mov rsi,0
 	mov rdi,[rsp+16]
@@ -44,9 +45,9 @@ i:resb 1
 	xor rdx,rdx
 	div rbx
 	mov [n],rax;we got da number of pages  
-	
-	.loop
 	mov [i],1
+
+	.loop
 	cmp [i],[n]
 	jne .scanpage
 	
@@ -57,10 +58,22 @@ i:resb 1
 	mov rdx,rbx
 	mov rcx,rbx*[i]
 	call readnbytes; read page
+	xor rdx,rdx
+	mov rdx,page_buf
+	call checkpage
+	inc [i]
+	jmp .loop
 
 	
 	
-
+checkpage:
+	mov rdi,rax
+	mov rsi,page_type
+	mov rdx,1
+	mov rcx,0
+	call readnbytes; read page
+	cmp [page_type],0x0D
+	
 
 
 	

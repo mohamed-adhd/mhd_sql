@@ -7,7 +7,7 @@ filelen equ $ -filename
 
 .bss
 align 8
-page buf: resb 65536
+page_buf: resb 65536
 header_buf: resb 100
 .text
 	mov rsi,0
@@ -15,6 +15,22 @@ header_buf: resb 100
 	mov rdx,0
 	mov rax,2
 	syscall;openin
+	mov rdi,rax
+	mov rsi,header_buf
+	mov rdx,2
+	mov rcx,16
+	call readnbytes
+	 
+
+
+
+
+
+
+
+
+
+
 
 readnbytes:
 	push rdi

@@ -5,30 +5,29 @@ filename:
 
 filelen equ $ -filename
 
+.bss
+align 8
+page buf: resb 65536
+header_buf: resb 100
 .text
-
-
-
-open_file:
 	mov rsi,0
-	mov rdi,filename
+	mov rdi,[rsp+16]
 	mov rdx,0
 	mov rax,2
-	syscall
-sys_read:
+	syscall;openin
+
+readnbytes:
+	push rdi
+	push rdx
+	push rsi
 	mov rax,8
 	mov rsi,rcx
 	mov rdx,0
-	syscall
+	syscall;seek	
 	pop rdx
 	pop rsi
-	pop rax
-
-
-
-
-
-
-
-
+	pop rdi
+	mov rax,0
+	syscall
+	ret
 

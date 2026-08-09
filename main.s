@@ -12,6 +12,7 @@ header_buf: resb 100
 temp: resb 144
 n:resq 1
 s: resq 1
+i:resb 1
 .text
 	mov rsi,0
 	mov rdi,[rsp+16]
@@ -44,8 +45,25 @@ s: resq 1
 	div rbx
 	mov [n],rax;we got da number of pages  
 	
-		 
+	.loop
+	mov [i],1
+	cmp [i],[n]
+	jne .scanpage
+	
 
+.scanpage:
+	mov rdi,rax
+	mov rsi,page_buf
+	mov rdx,rbx
+	mov rcx,rbx*[i]
+	call readnbytes; read page
+
+	
+	
+
+
+
+	
 
 
 

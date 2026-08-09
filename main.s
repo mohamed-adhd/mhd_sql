@@ -15,7 +15,8 @@ n:resq 1
 s: resq 1
 i:resb 1
 cells_number: word 1
-cells
+cellsn : resq 1
+cell:
 page_type:resb 1
 .text
 	mov rsi,0
@@ -91,9 +92,10 @@ checkpage:
 	shl rbx, 8
 	movzx rax, byte [cells_number+1]
 	or rbx,rax;
+	mov [cellsn],rbx
 	pop rax
 	pop rbx
-
+	
 	
 	
 	

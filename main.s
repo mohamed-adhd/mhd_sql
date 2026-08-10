@@ -113,8 +113,11 @@ _start:
     mov rax,[varint_value]
     mov [header_size],rax
     call read_varint
-    mov rsi,[type_len]
-    call get_len	
+    lea rsi,[type_len]
+    call get_len
+    call read_varint
+    lea rsi,[name_len]	
+    call get_len
 
 
 
@@ -174,13 +177,18 @@ ret
 mov [rsi],8
 ret
 .8eq:
-mov [rsi],1
+mov qwod [rsi],0
 ret
 .9eq:
-mov [rsi],1
+mov qword [rsi],0
 ret
 
-
+.txt:
+    mov rax,[varint_value]
+    sub rax, 12
+    shr rax,1
+    mov [rsi],rax
+    ret
 
 
 

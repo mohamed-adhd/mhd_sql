@@ -14,6 +14,15 @@ rowid:       resq 1
 payload_end: resq 1
 header_size: resq 1
 varint_value: resq 1
+
+
+type_length: resq 1
+name_length: resq 1
+tblname_length: resq 1
+root_length: resq 1
+
+
+
 align 8
 page_buf: resb 65536
 header_buf: resb 100
@@ -104,7 +113,6 @@ _start:
     mov rax,[varint_value]
     mov [header_size],rax
     call read_varint
-    call read_varint 
 	
 
 

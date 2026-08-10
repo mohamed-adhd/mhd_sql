@@ -13,7 +13,7 @@ temp: resb 144
 fd:resq 1
 n:resq 1
 s: resq 1
-i:resb 1
+i:resq 1
 cells_number: word 1
 cellsn : resq 1
 cell:
@@ -49,38 +49,44 @@ page_type:resb 1
 	xor rdx,rdx
 	div rbx
 	mov [n],rax;we got da number of pages  
-	mov [i],1
+	mov qword [i],1
 
 	.loop
-	cmp [i],[n]
-	jne .scanpage
+	mov rax,[i]
+    	cmp rax,[n]
+    	ja .scanpage
 	
 
 .scanpage:
 	mov rdi,rax
 	mov rsi,page_buf
 	mov rdx,rbx
-	mov rcx,rbx*[i]
+	mov rax, [i]
+	dec rax
+	imul rax, rbx
+	mov rcx, rax
 	call readnbytes; read page
 	xor rdx,rdx
 	mov rdx,page_buf
 	call checkpage
-	inc [i]
+	inc qword [i]
 	jmp .loop
 
 	
 	
 checkpage:
-	mov rdi,rax
+	mov rdi,page_buf
 	mov rsi,page_type
 	mov rdx,1
 	mov rcx,0
 	call readnbytes; read page
 	cmp [page_type],0x0D
 	je .we_got_a_nodder
+	jne ret
+	ret
 
 .we_got_a_nodder:
-	mov rdi,[fd]
+	mov rdi,[page_buff]
 	mov rsi,cells_number
 	mov rdx,2
 	mov rcx,3
@@ -95,6 +101,7 @@ checkpage:
 	mov [cellsn],rbx
 	pop rax
 	pop rbx
+	
 	
 	
 	

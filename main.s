@@ -11,6 +11,7 @@ cursor:      resq 1
 payload_len: resq 1
 rowid:       resq 1
 payload_end: resq 1
+varint_value: resq 1
 align 8
 page_buf: resb 65536
 header_buf: resb 100
@@ -106,21 +107,39 @@ checkpage:
 	add rax, [cell_start]
 	mov [cursor], rax
 	call read_varint
+	mov rax, [varint_value]
+	mov [payload_len], rax
+	call read_varint
+	
+	mov rax, [varint_value]
+	mov [rowid], rax
+
+
+
 
 .set_tha_shi:
 	mov [cell_start],65536
-	
-.read_varint:
-    movzx eax, byte [curs:or]
+
+read_varint:
+    xor rbx, rbx
+.read:
+    mov rdx, [cursor]
+    movzx eax, byte [rdx]
     test al, 0x80
-    jnz .more_bytes
-
-.more_bytes:
-
+    jz .last
+    and eax, 0x7f
+    shl rbx, 7
+    or  rbx, rax
     inc qword [cursor]
-    jmp .read_varint
+    jmp .read
 
-
+.last:
+    and eax, 0x7f
+    shl rbx, 7
+    or  rbx, rax
+    inc qword [cursor]
+    mov [varint_value], rbx
+    ret
 
 
 

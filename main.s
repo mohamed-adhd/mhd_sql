@@ -12,19 +12,20 @@ cursor:      resq 1
 payload_len: resq 1
 rowid:       resq 1
 payload_end: resq 1
+header_size: resq 1
 varint_value: resq 1
 align 8
 page_buf: resb 65536
 header_buf: resb 100
 temp: resb 144
 fd:resq 1
-n:resq 1
-s: resq 1
-i:resq 1
-cells_number: word 1
+n :resq 1
+s : resq 1
+i :resq 1
+cells_number : word 1
 cellsn : resq 1
-cell:
-page_type:resb 1
+rootpage :resq 1
+page_type : resb 1
 
 .text
 
@@ -89,16 +90,38 @@ _start:
     mov rax, page_buf
     add rax, [cell_start]
     mov [cursor], rax
-
-
+    
+    
     call read_varint
     mov rax, [varint_value]
     mov [payload_len], rax
-
+    
+    
     call read_varint
-    mov rax, [varint_value]
+    mov rax,[varint_value]
     mov [rowid],rax
-	mov
+    call read_varint
+    mov rax,[varint_value]
+    mov [header_size],rax
+    call read_varint
+    call read_varint 
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
     jmp .exit
 
 
@@ -106,6 +129,43 @@ _start:
 
   
     jmp .exit
+
+
+
+
+
+
+
+
+read_varint:
+    xor rbx, rbx
+.read:
+    mov rdx, [cursor]
+    movzx eax, byte [rdx]
+    test al, 0x80
+    jz .last
+    and eax, 0x7f
+    shl rbx, 7
+    or  rbx, rax
+    inc qword [cursor]
+    jmp .read
+
+.last:
+    and eax, 0x7f
+    shl rbx, 7
+    or  rbx, rax
+    inc qword [cursor]
+    mov [varint_value], rbx
+    ret
+
+
+
+
+
+
+
+
+
 
 
 .exit:

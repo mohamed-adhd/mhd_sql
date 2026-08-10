@@ -92,8 +92,52 @@ checkpage:
 	shl rax, 8
 	movzx rcx, byte [page_buf + 4]
 	or rax, rcx
+	push rax
+	movzx rax, byte [page_buf + 5]
+	shl rax, 8
+	movzx rcx, byte [page_buf + 6]
+	or rax, rcx
+	mov[cell_start],rax
+	cmp [cell_start],0
+	je .set_tha_shi
+	pop rax
 	mov [cellsn], rax
-	call .read_cells
+	mov rax, page_buf
+	add rax, [cell_start]
+	mov [cursor], rax
+	call read_varint
+
+.set_tha_shi:
+	mov [cell_start],65536
+	
+.read_varint:
+    movzx eax, byte [curs:or]
+    test al, 0x80
+    jnz .more_bytes
+
+.more_bytes:
+
+    inc qword [cursor]
+    jmp .read_varint
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.read_cells:
+	
 	
 	
 	

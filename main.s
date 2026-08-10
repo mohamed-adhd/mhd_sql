@@ -5,6 +5,7 @@ filename:
 
 filelen equ $ -filename
 
+
 .bss
 cell_start:  resq 1
 cursor:      resq 1
@@ -24,166 +25,91 @@ cells_number: word 1
 cellsn : resq 1
 cell:
 page_type:resb 1
+
 .text
-	mov rsi,0
-	mov rdi,[rsp+16]
-	mov rdx,0
-	mov rax,2
-	syscall;openin
-	mov [fd],rax
-	
-	mov rdi,rax
-	mov rsi,temp
-	mov rax,5
-	syscall; fstat call
-	mov rax,[temp +48]
-	push rax
-	
-	
-	mov rdi,rax
-	mov rsi,header_buf
-	mov rdx,2
-	mov rcx,16
-	call readnbytes; read the pages size
-	movzx rbx, byte [header_buf]
-	shl rbx, 8
-	movzx rax, byte [header_buf +1]
-	or rbx,rax;conversion from bigendian
-	
-	pop rax
-	xor rdx,rdx
-	div rbx
-	mov [n],rax;we got da number of pages  
-	mov qword [i],1
 
-	.loop
-	mov rax,[i]
-    	cmp rax,[n]
-    	ja .scanpage
-	
+_start:
 
-.scanpage:
-	mov rdi,[fd]
-	mov rsi,page_buf
-	mov rdx,rbx
-	mov rax, [i]
-	dec rax
-	imul rax, rbx
-	mov rcx, rax
-	call readnbytes; read page
-	xor rdx,rdx
-	mov rdx,page_buf
-	call checkpage
-	inc qword [i]
-	jmp .loop
+    mov rsi, 0
+    mov rdi, [rsp+16]
+    mov rdx, 0
+    mov rax, 2
+    syscall
+    mov [fd], rax
 
-	
-	
-checkpage:
-	
-	cmp byte [page_buf],0x0D
-	je .we_got_a_nodder
-	jne .notleaf
-	ret
-.notleaf:
-	ret
+    mov rdi, rax
+    mov rsi, temp
+    mov rax, 5
+    syscall;fstat call
 
-.we_got_a_nodder:
-	movzx rax, byte [page_buf + 3]
-	shl rax, 8
-	movzx rcx, byte [page_buf + 4]
-	or rax, rcx
-	push rax
-	movzx rax, byte [page_buf + 5]
-	shl rax, 8
-	movzx rcx, byte [page_buf + 6]
-	or rax, rcx
-	mov[cell_start],rax
-	cmp [cell_start],0
-	je .set_tha_shi
-	pop rax
-	mov [cellsn], rax
-	mov rax, page_buf
-	add rax, [cell_start]
-	mov [cursor], rax
-	call read_varint
-	mov rax, [varint_value]
-	mov [payload_len], rax
-	call read_varint
-	
-	mov rax, [varint_value]
-	mov [rowid], rax
+    mov rax, [temp + 48]
+    push rax
+    mov rdi, [fd]
+    mov rsi, header_buf
+    mov rdx, 2
+    mov rcx, 16
+    call readnbytes
+
+    movzx rbx, byte [header_buf]
+    shl rbx, 8
+    movzx rax, byte [header_buf + 1]
+    or rbx, rax; da number of pages is heree
+
+    pop rax
+    xor rdx, rdx
+    div rbx
+    mov [n], rax
+    mov rdi, [fd]
+    mov rsi, page_buf
+    mov rdx, rbx
+    xor rcx, rcx
+    call readnbytes
+    movzx eax, byte [page_buf + 100]
+    cmp al, 0x0D
+    je .schema_leaf
+
+    cmp al, 0x05
+    je .schema_interior
+    jmp .exit
 
 
+.schema_leaf:
+    movzx rax, byte [page_buf + 103]
+    shl rax, 8
+    movzx rcx, byte [page_buf + 104]
+    or rax, rcx
+    mov [cellsn], rax
+    movzx rax, byte [page_buf + 108]
+    shl rax, 8
+    movzx rcx, byte [page_buf + 109]
+    or rax, rcx
+
+    mov [cell_start], rax
+
+    mov rax, page_buf
+    add rax, [cell_start]
+    mov [cursor], rax
 
 
-.set_tha_shi:
-	mov [cell_start],65536
+    call read_varint
+    mov rax, [varint_value]
+    mov [payload_len], rax
 
-read_varint:
-    xor rbx, rbx
-.read:
-    mov rdx, [cursor]
-    movzx eax, byte [rdx]
-    test al, 0x80
-    jz .last
-    and eax, 0x7f
-    shl rbx, 7
-    or  rbx, rax
-    inc qword [cursor]
-    jmp .read
-
-.last:
-    and eax, 0x7f
-    shl rbx, 7
-    or  rbx, rax
-    inc qword [cursor]
-    mov [varint_value], rbx
-    ret
+    call read_varint
+    mov rax, [varint_value]
+    mov [rowid],rax
+	mov
+    jmp .exit
 
 
+.schema_interior:
+
+  
+    jmp .exit
 
 
+.exit:
 
-
-
-
-
-
-
-
-
-
-
-.read_cells:
-	
-	
-	
-	
-	
-	
-
-
-
-
-
-
-
-
-
-
-readnbytes:
-	push rdi
-	push rdx
-	push rsi
-	mov rax,8
-	mov rsi,rcx
-	mov rdx,0
-	syscall;seek	
-	pop rdx
-	pop rsi
-	pop rdi
-	mov rax,0
-	syscall
-	ret
-
+    mov rax, 60
+    xor rdi, rdi
+    syscall

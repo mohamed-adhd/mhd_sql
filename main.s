@@ -6,6 +6,11 @@ filename:
 filelen equ $ -filename
 
 .bss
+cell_start:  resq 1
+cursor:      resq 1
+payload_len: resq 1
+rowid:       resq 1
+payload_end: resq 1
 align 8
 page_buf: resb 65536
 header_buf: resb 100
@@ -28,7 +33,6 @@ page_type:resb 1
 	
 	mov rdi,rax
 	mov rsi,temp
-	push rax
 	mov rax,5
 	syscall; fstat call
 	mov rax,[temp +48]
@@ -58,7 +62,7 @@ page_type:resb 1
 	
 
 .scanpage:
-	mov rdi,rax
+	mov rdi,[fd]
 	mov rsi,page_buf
 	mov rdx,rbx
 	mov rax, [i]
@@ -75,32 +79,21 @@ page_type:resb 1
 	
 	
 checkpage:
-	mov rdi,page_buf
-	mov rsi,page_type
-	mov rdx,1
-	mov rcx,0
-	call readnbytes; read page
-	cmp [page_type],0x0D
+	
+	cmp byte [page_buf],0x0D
 	je .we_got_a_nodder
-	jne ret
+	jne .notleaf
+	ret
+.notleaf:
 	ret
 
 .we_got_a_nodder:
-	mov rdi,[page_buff]
-	mov rsi,cells_number
-	mov rdx,2
-	mov rcx,3
-	call readnbytes; read page
-	push rbx
-	push rax
-	mov rbx,rax
-	movzx rbx, byte [cells_number]
-	shl rbx, 8
-	movzx rax, byte [cells_number+1]
-	or rbx,rax;
-	mov [cellsn],rbx
-	pop rax
-	pop rbx
+	movzx rax, byte [page_buf + 3]
+	shl rax, 8
+	movzx rcx, byte [page_buf + 4]
+	or rax, rcx
+	mov [cellsn], rax
+	call .read_cells
 	
 	
 	

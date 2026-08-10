@@ -113,7 +113,57 @@ _start:
     mov rax,[varint_value]
     mov [header_size],rax
     call read_varint
-	
+    call get_len	
+
+
+
+
+
+get_len:
+cmp [varint_value],0
+je .0eq
+cmp [varint_value],1
+je .1eq
+cmp [varint_value],2
+je .2eq
+cmp [varint_value],3
+je .3eq
+cmp [varint_value],4
+je .4eq
+cmp [varint_value],5
+je .5eq
+cmp [varint_value],6
+je .6eq
+cmp [varint_value],7
+je .7eq
+cmp [varint_value],8
+je .8eq
+cmp [varint_value],9
+je .9eq
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

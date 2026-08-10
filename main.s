@@ -113,6 +113,7 @@ _start:
     mov rax,[varint_value]
     mov [header_size],rax
     call read_varint
+    mov rsi,[type_len]
     call get_len	
 
 
@@ -139,7 +140,9 @@ je .7eq
 cmp [varint_value],8
 je .8eq
 cmp [varint_value],9
-je .9eq
+je .9eq ;wish there was a better fucking way of doing ts, oh i forgot i m in asssembly...
+jne .txt
+ret
 
 
 
@@ -149,6 +152,33 @@ je .9eq
 
 
 
+.1eq:
+mov [rsi],1
+ret
+.2eq:
+mov [rsi],2
+ret
+.3eq:
+mov [rsi],3
+ret
+.4eq:
+mov [rsi],4
+ret
+.5eq:
+mov [rsi],6
+ret
+.6eq:
+mov [rsi],8
+ret
+.7eq:
+mov [rsi],8
+ret
+.8eq:
+mov [rsi],1
+ret
+.9eq:
+mov [rsi],1
+ret
 
 
 

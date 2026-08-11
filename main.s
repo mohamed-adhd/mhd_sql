@@ -140,11 +140,20 @@ _start:
     mov rdx, [name_length]
     mov rcx, cursor
     call readnbytes
+
+    mov rsi,testname
+    mov rdi,[rsp+24]
+    mov rcx,name_len
+    call strcmp_name
+    test rax, rax
+    jnz .FOUNDIT
+    
+   
     
 
+.FOUNDIT:
 
     
-
 
 
 

@@ -180,6 +180,46 @@ _start:
     jmp exit
 
 
+.root_1:
+    movzx rax, byte [cursor]
+    mov [rootpage], rax
+    jmp .got_rootpage
+
+.root_2:
+    movzx rax, byte [cursor]
+    shl rax, 8
+
+    movzx rcx, byte [cursor + 1]
+    or rax, rcx
+
+    mov [rootpage], rax
+    jmp .got_rootpage
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

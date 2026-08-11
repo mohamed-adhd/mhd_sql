@@ -210,7 +210,33 @@ _start:
 
 
 
+.root_3:
+    movzx rax, byte [cursor]
+    shl rax, 16
 
+    movzx rcx, byte [cursor + 1]
+    shl rcx, 8
+    or rax, rcx
+
+    movzx rcx, byte [cursor + 2]
+    or rax, rcx
+
+    mov [rootpage], rax;dawg sometimes i whish i had a gf and a normal life instead of this
+    jmp .got_rootpage
+
+
+.root_4:
+    movzx rax, byte [cursor]
+    shl rax, 24
+    movzx rcx, byte [cursor + 1]
+    shl rcx, 16
+    or rax, rcx
+    movzx rcx, byte [cursor + 2]
+    shl rcx, 8
+    or rax, rcx
+    movzx rcx, byte [cursor + 3]
+    or rax, rc
+    mov [rootpage], rax
 
 
 

@@ -156,6 +156,34 @@ _start:
     
 
 .FOUNDIT:
+    mov rax, [cursor]
+    add rax, [type_length]
+    add rax, [name_length]
+    add rax, [tbln_len]
+    mov [cursor], rax
+
+
+
+
+
+    mov rcx, [rec_len]
+
+    cmp rcx, 1
+    je .root_1
+    cmp rcx, 2
+    je .root_2
+    cmp rcx, 3
+    je .root_3
+    cmp rcx, 4
+    je .root_4
+
+    jmp exit
+
+
+
+
+
+
 
     jmp exit
     

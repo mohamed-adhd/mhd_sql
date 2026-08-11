@@ -140,10 +140,61 @@ _start:
     mov rdx, [name_length]
     mov rcx, cursor
     call readnbytes
-
-   
-	
     
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+strcmp_name:
+    ;wso  rsi = sqlite namy and  rdi = argv[2]  andd rcx = name length
+    xor rax, rax
+
+.cmp:
+    cmp rcx, 0
+    je .checkda_end
+
+    mov dl, [rsi]
+    cmp dl, [rdi]
+    jne .nual
+
+    inc rsi
+    inc rdi
+    dec rcx
+    jmp .cmp
+
+.checkda_end:
+    cmp byte [rdi], 0
+    jne .nual
+
+    mov rax, 1
+    ret
+
+.nual:
+    xor rax, rax
+    ret    
 
 
 

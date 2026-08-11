@@ -18,8 +18,8 @@ varint_value: resq 1
 
 type_length: resq 1
 name_length: resq 1
-tblname_length: resq 1
-root_length: resq 1
+tbln_len: resq 1
+rec_len: resq 1
 
 
 
@@ -112,12 +112,26 @@ _start:
     call read_varint
     mov rax,[varint_value]
     mov [header_size],rax
+    
     call read_varint
-    lea rsi,[type_len]
+    lea rsi,type_length
     call get_len
+    
     call read_varint
-    lea rsi,[name_len]	
+    lea rsi,name_length	
     call get_len
+    
+    call raed_varint
+    lea rsi,tbln_len
+    call get_len
+
+    call raed_varint
+    lea rsi,rec_len
+    call get_len
+
+    
+    
+
 
 
 

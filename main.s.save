@@ -1,14 +1,4 @@
-global _start
-
-section .rodata
-
-filename:
-    db "test.sqlite",10
-
-filelen equ $ -filename
-
-
-section .bss
+.bss
 cell_start:  resq 1
 cursor:      resq 1
 payload_len: resq 1
@@ -33,13 +23,12 @@ fd:resq 1
 n :resq 1
 s : resq 1
 i :resq 1
-cells_number : resw 1
+cells_number : word 1
 cellsn : resq 1
 rootpage :resq 1
 page_type : resb 1
-testname: resb 64
 
-section .text
+.text
 
 _start:
 
@@ -82,8 +71,8 @@ _start:
     je .schema_leaf
 
     cmp al, 0x05
-    je schema_interior
-    jmp exit
+    je .schema_interior
+    jmp .exit
 
 
 .schema_leaf:
@@ -92,9 +81,9 @@ _start:
     movzx rcx, byte [page_buf + 104]
     or rax, rcx
     mov [cellsn], rax
-    movzx rax, byte [page_buf + 105]
+    movzx rax, byte [page_buf + 108]
     shl rax, 8
-    movzx rcx, byte [page_buf + 106]
+    movzx rcx, byte [page_buf + 109]
     or rax, rcx
 
     mov [cell_start], rax
@@ -117,37 +106,36 @@ _start:
     mov [header_size],rax
     
     call read_varint
-    lea rsi,[type_length]
+    lea rsi,type_length
     call get_len
     
     call read_varint
-    lea rsi,[name_length]	
+    lea rsi,name_length	
     call get_len
     
-    call read_varint
-    lea rsi,[tbln_len]
+    call raed_varint
+    lea rsi,tbln_len
     call get_len
 
-    call read_varint
-    lea rsi,[rec_len]
+    call raed_varint
+    lea rsi,rec_len
     call get_len
 
     
-    mov rax, [type_length]
-    add [cursor], rax
+    add [cursor],[type_length]
     
 
     mov rax,[page_buf]
     push rax
-    mov rdi, [fd]
+    mov rdi, [page_buf]
     mov rsi, testname
     mov rdx, [name_length]
-    mov rcx, [cursor]
+    mov rcx, cursor
     call readnbytes
 
     mov rsi,testname
-    mov rdi,[rsp+32]
-    mov rcx,name_length
+    mov rdi,[rsp+24]
+    mov rcx,name_len
     call strcmp_name
     test rax, rax
     jnz .FOUNDIT
@@ -157,7 +145,6 @@ _start:
 
 .FOUNDIT:
 
-    jmp exit
     
 
 
@@ -216,25 +203,25 @@ strcmp_name:
 
 
 get_len:
-cmp qword [varint_value],0
+cmp [varint_value],0
 je .0eq
-cmp qword [varint_value],1
+cmp [varint_value],1
 je .1eq
-cmp qword [varint_value],2
+cmp [varint_value],2
 je .2eq
-cmp qword [varint_value],3
+cmp [varint_value],3
 je .3eq
-cmp qword [varint_value],4
+cmp [varint_value],4
 je .4eq
-cmp qword [varint_value],5
+cmp [varint_value],5
 je .5eq
-cmp qword [varint_value],6
+cmp [varint_value],6
 je .6eq
-cmp qword [varint_value],7
+cmp [varint_value],7
 je .7eq
-cmp qword [varint_value],8
+cmp [varint_value],8
 je .8eq
-cmp qword [varint_value],9
+cmp [varint_value],9
 je .9eq ;wish there was a better fucking way of doing ts, oh i forgot i m in asssembly...
 jne .txt
 ret
@@ -247,32 +234,29 @@ ret
 
 
 
-.0eq:
-mov qword [rsi],0
-ret
 .1eq:
-mov qword [rsi],1
+mov [rsi],1
 ret
 .2eq:
-mov qword [rsi],2
+mov [rsi],2
 ret
 .3eq:
-mov qword [rsi],3
+mov [rsi],3
 ret
 .4eq:
-mov qword [rsi],4
+mov [rsi],4
 ret
 .5eq:
-mov qword [rsi],6
+mov [rsi],6
 ret
 .6eq:
-mov qword [rsi],8
+mov [rsi],8
 ret
 .7eq:
-mov qword [rsi],8
+mov [rsi],8
 ret
 .8eq:
-mov qword [rsi],0
+mov qwod [rsi],0
 ret
 .9eq:
 mov qword [rsi],0
@@ -313,13 +297,13 @@ ret
 
 
     
-    jmp exit
+    jmp .exit
 
 
-schema_interior:
+.schema_interior:
 
   
-    jmp exit
+    jmp .exit
 
 
 
@@ -373,7 +357,7 @@ readnbytes:
 
 
 
-exit:
+.exit:
 
     mov rax, 60
     xor rdi, rdi

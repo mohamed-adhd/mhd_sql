@@ -130,6 +130,19 @@ _start:
     call get_len
 
     
+    add [cursor],[type_length]
+    
+
+    mov rax,[page_buf]
+    push rax
+    mov rdi, [page_buf]
+    mov rsi, testname
+    mov rdx, [name_length]
+    mov rcx, cursor
+    call readnbytes
+
+   
+	
     
 
 
@@ -271,6 +284,20 @@ read_varint:
 
 
 
+readnbytes:
+	push rdi
+	push rdx
+	push rsi
+	mov rax,8
+	mov rsi,rcx
+	mov rdx,0
+	syscall;seek	
+	pop rdx
+	pop rsi
+	pop rdi
+	mov rax,0
+	syscall
+	ret
 
 
 

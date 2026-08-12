@@ -151,6 +151,14 @@ _start:
     call strcmp_name
     test rax, rax
     jnz .FOUNDIT
+    mov rax,[root_page]
+    dec rax
+    imul rax,rbx
+    mov rdi, [fd]
+    mov rsi, page_buf
+    mov rdx, rbx
+    mov rcx, rax
+    call readnbytes
     
    
     
@@ -174,8 +182,9 @@ _start:
     je .root_2
     cmp rcx, 3
     je .root_3
-    cmp rcx, 4
+    cmp rcx, 4;sometimes i loose myslf here bruh
     je .root_4
+
 
     jmp exit
 

@@ -25,6 +25,33 @@ rec_len: resq 1
 
 
 
+payload_headlen:  resq 1
+columns_number:      resq 1
+payload_end: resq 1
+rowid:       resq 1
+payload_end: resq 1
+header_size: resq 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 align 8
 page_buf: resb 65536
 header_buf: resb 100
@@ -200,6 +227,19 @@ _start:
    mov rdx, [payload_length]
    mov rcx, cursor
    call readnbytes
+   call decodepayload
+
+
+
+
+decodepaylaod:
+   mov rax, [header_start]
+   add rax, [header_size]
+   mov [header_end], rax
+   
+
+
+
 
    
    

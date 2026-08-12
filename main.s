@@ -228,34 +228,78 @@ _start:
    mov rdx, [payload_length]
    mov rcx, cursor
    call readnbytes
+   
+   mov rax, [cell_start]
+   add rax, [header_size]
+   add rax, page_buf
+   mov [body_cursor], rax
    call decodepayload
-
+   
 
  // the cursor is at the payload heder , you just read the payload length, focus now set the body cursor at the actual body
    
 .read_column:
 
-    ; header cursor points at next serial type
     mov rax, [header_cursor]
     cmp rax, [header_end]
     jae .done
-
     mov [cursor], rax
     call read_varint
-    mov rax, [varint_value]
-
-    
-    mov rax, [body_cursor]
-    add rax, [value_length]
-    mov [body_cursor], rax
-
+    call decode_serial_type
+    call process_column
     mov rax, [cursor]
     mov [header_cursor], rax
-
     jmp .read_column
     
-   
-   
+  
+
+decode_serial_type:
+  mov rax, [varint_value]
+    cmp rax, 0
+    je .nul
+    cmp rax, 1
+    je .int1
+    cmp rax, 2
+    je .int2
+    cmp rax, 3
+    je .int3
+
+
+;10,36 pm
+    
+
+
+    cmp rax, 4
+    je .int4
+    cmp rax, 5
+    je .int6
+    cmp rax, 6
+    je .int8
+    cmp rax, 7
+    je .float8
+    cmp rax, 8
+    je .zero
+    cmp rax, 9
+    je .one
+    cmp rax, 12
+    jb .bs
+    test rax, 1
+    jnz .text                                           
+
+
+
+
+
+
+
+
+
+
+
+
+
+process_column:
+
 
 
 

@@ -62,6 +62,7 @@ s : resq 1
 i :resq 1
 cells_number : resw 1
 cellsn : resq 1
+body_cursor  : resq 1
 rootpage :resq 1
 page_type : resb 1
 testname: resb 64
@@ -230,12 +231,30 @@ _start:
    call decodepayload
 
 
+ // the cursor is at the payload heder , you just read the payload length, focus now set the body cursor at the actual body
+   
+.read_column:
 
+    ; header cursor points at next serial type
+    mov rax, [header_cursor]
+    cmp rax, [header_end]
+    jae .done
 
-decodepaylaod:
-   mov rax, [header_start]
-   add rax, [header_size]
-   mov [header_end], rax
+    mov [cursor], rax
+    call read_varint
+    mov rax, [varint_value]
+
+ 
+    mov rax, [body_cursor]
+    add rax, [value_length]
+    mov [body_cursor], rax
+
+    mov rax, [cursor]
+    mov [header_cursor], rax
+
+    jmp .read_column
+    
+   
    
 
 

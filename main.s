@@ -151,7 +151,7 @@ _start:
     call strcmp_name
     test rax, rax
     jnz .FOUNDIT
-    mov rax,[root_page]
+    mov rax,[rootpage]
     dec rax
     imul rax,rbx
     mov rdi, [fd]
@@ -171,7 +171,7 @@ _start:
 
 .we_got_a_nodder:
     movzx eax, byte [page_buf]
-    cmp eax, 0x0D
+    cmp eax, 0x05
     jne .not_leaf
 
     movzx eax, word [page_buf + 3]
@@ -180,6 +180,28 @@ _start:
     movzx ecx, byte [page_buf + 4]
     or eax, ecx
     mov  [cellsn], rax
+    movzx eax,[page_buf+8]
+    movzx eax, byte [page_buf + 8]
+    shl eax, 8
+    movzx ecx, byte [page_buf + 9]
+    or eax, ecx
+    lea rax, [page_buf + rax]
+    mov [cursor], rax
+   
+
+   call read_varint
+   mov [payload_len],[varint_value]
+   call read_varint
+   mov [row_id],[varint_value]
+   mov rax, [temp + 48]
+   push rax
+   mov rdi, [page_buffer]
+   mov rsi, [temp_payload]
+   mov rdx, [payload_length]
+   mov rcx, cursor
+   call readnbytes
+
+   
    
 
 

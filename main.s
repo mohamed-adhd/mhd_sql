@@ -244,7 +244,7 @@ _start:
     call read_varint
     mov rax, [varint_value]
 
- 
+    
     mov rax, [body_cursor]
     add rax, [value_length]
     mov [body_cursor], rax
@@ -300,6 +300,27 @@ _start:
 
 
 
+atoi:
+    push rbp
+    mov rbp,rsp
+    xor rax,rax
+    xor rcx,rcx
+.loop:
+    mov cl,[rdi]
+    cmp cl,'0'
+    jl .done
+    cmp cl,'9'
+    jg .done
+    sub cl,'0'
+    imul rax,10
+    add rax,rcx
+    inc rdi
+    jmp .loop
+
+.done :
+    leave 
+    ret
+    
 
     
    

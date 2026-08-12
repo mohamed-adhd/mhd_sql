@@ -157,8 +157,69 @@ _start:
     mov rdi, [fd]
     mov rsi, page_buf
     mov rdx, rbx
-    mov rcx, rax
+    mov rcx, rax; focus you are here , this mf vim editor is so ass
     call readnbytes
+    movzx eax, byte [page_buf]
+    cmp eax,0x0D
+    je .we_got_a_nodder
+    jne .maybenot
+
+.maybenot:
+    cmp eax,0x0D
+    je .interior
+    jne .next
+
+.we_got_a_nodder:
+    movzx eax, byte [page_buf]
+    cmp eax, 0x0D
+    jne .not_leaf
+
+    movzx eax, word [page_buf + 3]
+    movzx eax, byte [page_buf + 3]
+    shl eax, 8
+    movzx ecx, byte [page_buf + 4]
+    or eax, ecx
+    mov  [cellsn], rax
+   
+
+
+
+
+
+
+
+
+
+
+
+.interior
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
    
     

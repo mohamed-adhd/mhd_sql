@@ -282,10 +282,78 @@ decode_serial_type:
     cmp rax, 9
     je .one
     cmp rax, 12
-    jb .bs
+    jb .pisashi
     test rax, 1
     jnz .text                                           
+.blob:
+    sub rax, 12
+    shr rax, 1
+    mov [rec_len], rax
+    mov qword [column_type], 2       ; 2 = blob
+    ret
 
+.text:
+    sub rax, 13
+    shr rax, 1
+    mov [rec_len], rax
+    mov qword [column_type], 1       ; 1 = text
+    ret
+
+
+.null:
+    mov qword [rec_len], 0
+    mov qword [column_type], 0
+    ret
+
+.int1:
+    mov qword [rec_len], 1
+    mov qword [column_type], 3
+    ret
+
+.int2:
+    mov qword [rec_len], 2
+    mov qword [column_type], 3
+    ret
+
+.int3:
+    mov qword [rec_len], 3
+    mov qword [column_type], 3
+    ret
+
+.int4:
+    mov qword [rec_len], 4
+    mov qword [column_type], 3
+    ret
+
+.int6:
+    mov qword [rec_len], 6
+    mov qword [column_type], 3
+    ret
+
+.int8:
+    mov qword [rec_len], 8
+    mov qword [column_type], 3
+    ret
+
+.float8:
+    mov qword [rec_len], 8
+    mov qword [column_type], 4
+    ret
+
+.zero:
+    mov qword [rec_len], 0
+    mov qword [column_type], 3
+    ret
+
+.one:
+    mov qword [rec_len], 0
+    mov qword [column_type], 3
+    ret
+
+.pisashi:
+    mov qword [rec_len], 0
+    mov qword [column_type], -1
+    ret
 
 
 

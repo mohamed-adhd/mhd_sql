@@ -218,16 +218,12 @@ _start:
    
 
    call read_varint
-   mov [payload_len],[varint_value]
+   mov rax, [varint_value]
+   mov [payload_len], rax
    call read_varint
-   mov [row_id],[varint_value]
+   mov rax, [varint_value]
+   mov [rowid], rax
    mov rax, [temp + 48]
-   push rax
-   mov rdi, [page_buffer]
-   mov rsi, [temp_payload]
-   mov rdx, [payload_length]
-   mov rcx, cursor
-   call readnbytes
    
    mov rax, [cell_start]
    add rax, [header_size]
@@ -367,7 +363,11 @@ decode_serial_type:
 
 
 process_column:
-
+    mov rax, [column_type]
+    cmp rax, 1
+    je .print_text
+    cmp rax, 3
+    je .print_int
 
 
 

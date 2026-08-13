@@ -40,7 +40,9 @@ header_size: resq 1
 
 
 
-
+count:        resb 1
+itoa_buffer:  resb 24
+itoa_len:     resb 1
 
 
 
@@ -379,15 +381,39 @@ process_column:
     jmp .advance
 
 .print_int:
+    call load_int_be
+    call itoa
+    mov rax, 1  
+    mov rdi, 1
+    lea rsi, [itoa_buffer]
+    movzx rdx, byte [itoa_len]
+    syscall
+
+
+
+
+
+
+
+
+
     jmp .advance
-
+    
    
    
 
-
-
-
-
+load_int_be:
+    xor rax, rax
+    mov rsi, [body_cursor]
+    mov rcx, [rec_len]
+.next_byte:
+    shl rax, 8
+    movzx rdx, byte [rsi]
+    or rax, rdx
+    inc rsi
+    dec rcx
+    jnz .next_byte
+    ret
 
 
 

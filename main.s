@@ -49,7 +49,7 @@ header_size: resq 1
 
 
 
-
+column_type: resq 1
 
 
 align 8
@@ -289,18 +289,18 @@ decode_serial_type:
     sub rax, 12
     shr rax, 1
     mov [rec_len], rax
-    mov qword [column_type], 2       ; 2 = blob
+    mov qword [column_type], 2  
     ret
 
 .text:
     sub rax, 13
     shr rax, 1
     mov [rec_len], rax
-    mov qword [column_type], 1       ; 1 = text
+    mov qword [column_type], 1      
     ret
 
 
-.null:
+.nul:
     mov qword [rec_len], 0
     mov qword [column_type], 0
     ret

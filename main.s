@@ -370,7 +370,16 @@ process_column:
     je .print_int
 
 
+.print_text:
+    mov rax, 1   
+    mov rdi, 1        
+    mov rsi, [body_cursor]
+    mov rdx, [rec_len]
+    syscall
+    jmp .advance
 
+.print_int:
+    jmp .advance
 
    
    

@@ -421,27 +421,28 @@ process_column:
 
 
 
-atoi:
+
+itoa:
     push rbp
     mov rbp,rsp
-    xor rax,rax
-    xor rcx,rcx
+    mov rcx,10
 .loop:
-    mov cl,[rdi]
-    cmp cl,'0'
-    jl .done
-    cmp cl,'9'
-    jg .done
-    sub cl,'0'
-    imul rax,10
-    add rax,rcx
+    xor rdx,rdx
+    div rcx
+    add dl,'0'
+    push rdx
+    inc byte [count]
+    cmp rax,0
+    jne .loop
+    mov  al, [count]
+    mov  [itoa_len], al
+    lea rdi, [itoa_buffer]
+.pop:
+    pop rax
+    mov [rdi],al
     inc rdi
-    jmp .loop
-
-.done :
-    leave 
-    ret
-    
+    dec byte [count]
+    jnz .pop 
 
     
    

@@ -8,6 +8,25 @@ filename:
 filelen equ $ -filename
 
 
+no_table:
+    db "table doesnt exist twin"
+
+no_table_len equ $ -no_table
+
+
+file:
+    db "file is not there gng"
+
+file_len equ $ -file
+
+
+
+
+
+
+
+
+
 section .bss
 cell_start:  resq 1
 cursor:      resq 1

@@ -170,9 +170,17 @@ _start:
     call read_varint
     mov rax,[varint_value]
     mov [rowid],rax
+
+    mov rax, [cursor]
+    mov [header_start], rax
+
     call read_varint
     mov rax,[varint_value]
     mov [header_size],rax
+
+    mov rax, [header_start]
+    add rax, [header_size]
+    mov [body_cursor], rax
     
     call read_varint
     lea rsi,[type_length]
@@ -195,17 +203,15 @@ _start:
     add [cursor], rax
     
 
-    mov rax,[page_buf]
-    push rax
-    mov rdi, [fd]
-    mov rsi, testname
-    mov rdx, [name_length]
-    mov rcx, [cursor]
-    call readnbytes
+    mov rsi, [body_cursor]
+    add rsi, [type_length]
+    mov rdi, testname
+    mov rcx, [name_length]
+    rep movsb
 
-    mov rsi,testname
-    mov rdi,[argv2]
-    mov rcx,name_length
+    mov  rsi, testname
+    mov rdi, [argv2]
+    mov rcx, [name_length]
     call strcmp_name
     test rax, rax
     jnz FOUNDIT
@@ -436,7 +442,7 @@ itoa:
     
 
 FOUNDIT:
-    mov rax, [cursor]
+    mov rax, [body_cursor]
     add rax, [type_length]
     add rax, [name_length]
     add rax, [tbln_len]

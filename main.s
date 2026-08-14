@@ -71,6 +71,9 @@ itoa_len:     resb 1
 
 
 column_type: resq 1
+header_start: resq 1
+header_end: resq 1
+header_cursor: resq 1
 
 
 align 8
@@ -200,62 +203,9 @@ _start:
     call strcmp_name
     test rax, rax
     jnz .FOUNDIT
-    mov rax,[rootpage]
-    dec rax
-    imul rax,rbx
-    mov rdi, [fd]
-    mov rsi, page_buf
-    mov rdx, rbx
-    mov rcx, rax; focus you are here , this mf vim editor is so ass
-    call readnbytes
-    movzx eax, byte [page_buf]
-    cmp eax,0x0D
-    je .we_got_a_nodder
-    jne .maybenot
+    jmp exit
 
-.maybenot:
-    cmp eax,0x0D
-    je .interior
-    jne .next
-
-.we_got_a_nodder:
-    movzx eax, byte [page_buf]
-    cmp eax, 0x05
-    jne .not_leaf
-
-    movzx eax, word [page_buf + 3]
-    movzx eax, byte [page_buf + 3]
-    shl eax, 8
-    movzx ecx, byte [page_buf + 4]
-    or eax, ecx
-    mov  [cellsn], rax
-    movzx eax,[page_buf+8]
-    movzx eax, byte [page_buf + 8]
-    shl eax, 8
-    movzx ecx, byte [page_buf + 9]
-    or eax, ecx
-    lea rax, [page_buf + rax]
-    mov [cursor], rax
-   
-
-   call read_varint
-   mov rax, [varint_value]
-   mov [payload_len], rax
-   call read_varint
-   mov rax, [varint_value]
-   mov [rowid], rax
-   mov rax, [temp + 48]
-   
-   mov rax, [cell_start]
-   add rax, [header_size]
-   add rax, page_buf
-   mov [body_cursor], rax
-   call decodepayload
-   
-
- // the cursor is at the payload heder , you just read the payload length, focus now set the body cursor at the actual body
-   
-.read_column:
+read_column:
 
     mov rax, [header_cursor]
     cmp rax, [header_end]
@@ -266,7 +216,7 @@ _start:
     call process_column
     mov rax, [cursor]
     mov [header_cursor], rax
-    jmp .read_column
+    jmp read_column
     
   
 
@@ -522,7 +472,7 @@ itoa:
 .root_1:
     movzx rax, byte [cursor]
     mov [rootpage], rax
-    jmp .got_rootpage
+    jmp got_rootpage
 
 .root_2:
     movzx rax, byte [cursor]
@@ -532,7 +482,7 @@ itoa:
     or rax, rcx
 
     mov [rootpage], rax
-    jmp .got_rootpage
+    jmp got_rootpage
 
 
 
@@ -561,7 +511,7 @@ itoa:
     or rax, rcx
 
     mov [rootpage], rax;dawg sometimes i whish i had a gf and a normal life instead of this
-    jmp .got_rootpage
+    jmp got_rootpage
 
 
 .root_4:
@@ -591,7 +541,70 @@ itoa:
 
 
     jmp exit
-    
+
+got_rootpage:
+    mov rax,[rootpage]
+    dec rax
+    imul rax,rbx
+    mov rdi, [fd]
+    mov rsi, page_buf
+    mov rdx, rbx
+    mov rcx, rax
+    call readnbytes
+    movzx eax, byte [page_buf]
+    cmp eax,0x0D
+    je .we_got_a_nodder
+    jne .maybenot
+
+.maybenot:
+    cmp eax,0x0D
+    je .interior
+    jne .next
+
+.we_got_a_nodder:
+    movzx eax, byte [page_buf]
+    cmp eax, 0x05
+    jne .not_leaf
+
+    movzx eax, byte [page_buf + 3]
+    shl eax, 8
+    movzx ecx, byte [page_buf + 4]
+    or eax, ecx
+    mov  [cellsn], rax
+    movzx eax, byte [page_buf + 8]
+    shl eax, 8
+    movzx ecx, byte [page_buf + 9]
+    or eax, ecx
+    lea rax, [page_buf + rax]
+    mov [cursor], rax
+
+    call read_varint
+    mov rax, [varint_value]
+    mov [payload_len], rax
+
+    call read_varint
+    mov rax, [varint_value]
+    mov [rowid], rax
+
+    mov rax, [cursor]
+    mov [header_start], rax
+
+    call read_varint
+    mov rax, [varint_value]
+    mov [header_size], rax
+
+    mov rax, [header_start]
+    add rax, [header_size]
+    mov [header_end], rax
+
+    mov rax, [cursor]
+    mov [header_cursor], rax
+
+    mov rax, [header_start]
+    add rax, [header_size]
+    mov [body_cursor], rax
+
+    jmp read_column
 
 
 

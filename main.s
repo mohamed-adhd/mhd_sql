@@ -324,7 +324,9 @@ decode_serial_type:
 
 
 
-
+    jmp got_rootpage
+.done:
+    jmp exit
 
 
 
@@ -368,7 +370,11 @@ process_column:
 
     jmp .advance
     
-   
+.advance:
+       mov rax, [body_cursor]
+       add rax, [rec_len]
+       mov [body_cursor], rax
+       ret
    
 
 load_int_be:
@@ -438,6 +444,7 @@ itoa:
     inc rdi
     dec byte [count]
     jnz .pop 
+    ret
 
     
    
@@ -524,8 +531,9 @@ itoa:
     shl rcx, 8
     or rax, rcx
     movzx rcx, byte [cursor + 3]
-    or rax, rc
+    or rax, rcx
     mov [rootpage], rax
+    jmp got_rootpage
 
 
 
@@ -609,7 +617,14 @@ got_rootpage:
 
 
 
+.not_leaf:
+    jmp exit
 
+.next:
+    jmp exit
+
+.interior:
+    jmp exit
 
 
 

@@ -41,7 +41,10 @@ rowid:       resq 1
 payload_end: resq 1
 header_size: resq 1
 varint_value: resq 1
+ 
 
+
+argv2: resq 1
 
 type_length: resq 1
 name_length: resq 1
@@ -96,7 +99,8 @@ testname: resb 64
 section .text
 
 _start:
-
+    mov rax, [rsp+24]
+    mov [argv2], rax
     mov rsi, 0
     mov rdi, [rsp+16]
     mov rdx, 0
@@ -200,7 +204,7 @@ _start:
     call readnbytes
 
     mov rsi,testname
-    mov rdi,[rsp+32]
+    mov rdi,[argv2]
     mov rcx,name_length
     call strcmp_name
     test rax, rax
@@ -211,7 +215,7 @@ read_column:
 
     mov rax, [header_cursor]
     cmp rax, [header_end]
-    jae .done
+    jae done
     mov [cursor], rax
     call read_varint
     call decode_serial_type
@@ -327,7 +331,7 @@ decode_serial_type:
 
 
     jmp got_rootpage
-.done:
+done:
     jmp exit
 
 
@@ -791,9 +795,6 @@ read_varint:
     mov [varint_value], rbx
     ret
 
-
-
-
 readnbytes:
 	push rdi
 	push rdx
@@ -801,15 +802,13 @@ readnbytes:
 	mov rax,8
 	mov rsi,rcx
 	mov rdx,0
-	syscall;seek	
-	pop rdx
+	syscall; seek syscall
 	pop rsi
+	pop rdx
 	pop rdi
 	mov rax,0
 	syscall
 	ret
-
-
 
 
 

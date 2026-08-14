@@ -23,7 +23,7 @@ file_len equ $ -file
 
 space:
    db "||",10
-space_len $ -space
+space_len equ $ -space
 
 
 
@@ -52,10 +52,6 @@ rec_len: resq 1
 
 payload_headlen:  resq 1
 columns_number:      resq 1
-payload_end: resq 1
-rowid:       resq 1
-payload_end: resq 1
-header_size: resq 1
 
 
 
@@ -208,7 +204,7 @@ _start:
     mov rcx,name_length
     call strcmp_name
     test rax, rax
-    jnz .FOUNDIT
+    jnz FOUNDIT
     jmp exit
 
 read_column:
@@ -405,34 +401,8 @@ load_int_be:
 
 
 
-.interior
+.interior:
  jmp exit
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 itoa:
     push rbp
@@ -461,7 +431,7 @@ itoa:
    
     
 
-.FOUNDIT:
+FOUNDIT:
     mov rax, [cursor]
     add rax, [type_length]
     add rax, [name_length]

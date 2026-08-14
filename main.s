@@ -9,15 +9,21 @@ filelen equ $ -filename
 
 
 no_table:
-    db "table doesnt exist twin"
+    db "table doesnt exist twin",10
 
 no_table_len equ $ -no_table
 
 
 file:
-    db "file is not there gng"
+    db "file is not there gng",10
 
 file_len equ $ -file
+
+
+
+space:
+   db "||",10
+space_len $ -space
 
 
 
@@ -371,10 +377,14 @@ process_column:
     jmp .advance
     
 .advance:
-       mov rax, [body_cursor]
-       add rax, [rec_len]
-       mov [body_cursor], rax
-       ret
+      mov rdi,1
+      mov rsi,space
+      mov rdx,space_len
+      syscall
+   mov rax, [body_cursor]
+   add rax, [rec_len]
+   mov [body_cursor], rax
+   ret
    
 
 load_int_be:
@@ -396,6 +406,7 @@ load_int_be:
 
 
 .interior
+ jmp exit
 
 
 

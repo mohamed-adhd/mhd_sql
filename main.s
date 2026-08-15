@@ -468,17 +468,17 @@ FOUNDIT:
 
 
 .root_1:
-    movzx rax, byte [cursor]
+    mov rax, [cursor]
+    movzx rax, byte [rax]
     mov [rootpage], rax
     jmp got_rootpage
 
 .root_2:
-    movzx rax, byte [cursor]
+    mov rdx, [cursor]
+    movzx rax, byte [rdx]
     shl rax, 8
-
-    movzx rcx, byte [cursor + 1]
+    movzx rcx, byte [rdx + 1]
     or rax, rcx
-
     mov [rootpage], rax
     jmp got_rootpage
 
@@ -781,6 +781,7 @@ schema_interior:
 
 
 read_varint:
+    push rbx
     xor rbx, rbx
 .read:
     mov rdx, [cursor]
@@ -799,6 +800,7 @@ read_varint:
     or  rbx, rax
     inc qword [cursor]
     mov [varint_value], rbx
+    pop rbx
     ret
 
 readnbytes:

@@ -398,6 +398,8 @@ load_int_be:
     xor rax, rax
     mov rsi, [body_cursor]
     mov rcx, [rec_len]
+    test rcx, rcx
+    jz .done
 .next_byte:
     shl rax, 8
     movzx rdx, byte [rsi]
@@ -405,6 +407,7 @@ load_int_be:
     inc rsi
     dec rcx
     jnz .next_byte
+.done:
     ret
 
 

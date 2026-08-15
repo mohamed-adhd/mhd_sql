@@ -383,6 +383,7 @@ process_column:
     jmp .advance
     
 .advance:
+      mov rax,1 
       mov rdi,1
       mov rsi,space
       mov rdx,space_len
@@ -435,6 +436,7 @@ itoa:
     inc rdi
     dec byte [count]
     jnz .pop 
+    pop rbp
     ret
 
     
@@ -498,30 +500,31 @@ FOUNDIT:
 
 
 .root_3:
-    movzx rax, byte [cursor]
+    mov rdx, [cursor]
+    movzx rax, byte [rdx]
     shl rax, 16
-
-    movzx rcx, byte [cursor + 1]
+    movzx rcx, byte [rdx + 1]
     shl rcx, 8
-    or rax, rcx
+    or rax, rcx;dawg sometimes i whish i had a gf and a normal life instead of this
 
-    movzx rcx, byte [cursor + 2]
+    movzx rcx, byte [rdx + 2]
     or rax, rcx
-
-    mov [rootpage], rax;dawg sometimes i whish i had a gf and a normal life instead of this
+    mov [rootpage], rax
     jmp got_rootpage
+    
 
 
 .root_4:
-    movzx rax, byte [cursor]
+    mov rdx, [cursor]
+    movzx rax, byte [rdx]
     shl rax, 24
-    movzx rcx, byte [cursor + 1]
+    movzx rcx, byte [rdx + 1]
     shl rcx, 16
     or rax, rcx
-    movzx rcx, byte [cursor + 2]
+    movzx rcx, byte [rdx + 2]
     shl rcx, 8
     or rax, rcx
-    movzx rcx, byte [cursor + 3]
+    movzx rcx, byte [rdx + 3]
     or rax, rcx
     mov [rootpage], rax
     jmp got_rootpage
@@ -562,7 +565,7 @@ got_rootpage:
 
 .we_got_a_nodder:
     movzx eax, byte [page_buf]
-    cmp eax, 0x05
+    cmp eax, 0x0D
     jne .not_leaf
 
     movzx eax, byte [page_buf + 3]

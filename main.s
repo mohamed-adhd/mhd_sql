@@ -98,6 +98,31 @@ testname: resb 64
 
 section .text
 
+
+chekit:
+    mov qword [matches], 0
+    mov rax, page_buf
+    add rax, 108
+    mov [cp_ptr], rax
+ 
+    mov rax, [cellsn]
+    mov [idx], rax
+
+
+
+
+
+
+.checkit_loop:
+    cmp qword [idx], 0
+    je .checkit_done
+    mov rbx, [cp_ptr]
+    movzx rax, byte [rbx]
+    shl rax, 8
+    movzx rdx, byte [rbx + 1]
+    or rax, rdx
+
+
 _start:
     mov rax, [rsp+24]
     mov [argv2], rax

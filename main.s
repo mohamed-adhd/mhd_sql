@@ -8,10 +8,10 @@ filename:
 filelen equ $ -filename
 
 
-no_table:
+tnf:
     db "table doesnt exist twin",10
 
-no_table_len equ $ -no_table
+tnf_len equ $ -tnf
 
 
 file:
@@ -89,6 +89,17 @@ fd:resq 1
 n :resq 1
 s : resq 1
 i :resq 1
+
+
+matches: resq 1
+cp_ptr resq 1
+idx: resq 1
+
+ck_body: resq 1
+
+
+
+
 cells_number : resw 1
 cellsn : resq 1
 body_cursor  : resq 1
@@ -107,6 +118,69 @@ chekit:
  
     mov rax, [cellsn]
     mov [idx], rax
+    mov rdx, page_buf
+    add rdx, rax
+    mov [cursor], rdx 
+ 
+
+
+
+
+
+
+
+    call read_varint   
+    call read_varint  
+    mov rax, [cursor]
+    call read_varint
+    mov rax, [varint_value]
+    mov [header_size], rax
+    mov rax, [cursor]
+    mov [ck_body], rax
+    add qword [ck_body], [header_size]
+    call read_varint         
+    lea rsi, [type_length]
+    call get_len
+    call read_varint        
+    lea rsi, [name_length]
+    call get_len
+ 
+
+
+
+
+;i will suck my own dick if i ever set foot in assembly again
+
+
+
+
+
+
+    mov rsi, [ck_body]
+    add rsi, [type_length]
+    mov rdi, testname
+    mov rcx, [name_length]
+    rep movsb
+     mov rsi, testname
+    mov rdi, [argv2]
+    mov rcx, [name_length]
+    call strcmp_name
+    test rax, rax
+    jz .checkit_next
+    inc qword [matches]
+ checkit_next:
+    mov rax, [cp_ptr]
+    add rax, 2
+    mov [cp_ptr], rax
+    dec qword [idx]
+    jmp .checkit_loop
+.checkit_done:
+    mov rax, [matches]
+    cmp rax, 1  
+    ret
+
+
+
 
 
 
@@ -181,6 +255,8 @@ _start:
     or rax, rcx
 
     mov [cell_start], rax
+    call checkit
+    jne no_table_missing 
 
     mov rax, page_buf
     add rax, [cell_start]
@@ -242,6 +318,12 @@ _start:
     jnz FOUNDIT
     jmp exit
 
+
+
+no_table_missing:
+    mov rdi,1
+    mov rsi,tnf
+    mov rdx,tnf_len 
 read_column:
 
     mov rax, [header_cursor]

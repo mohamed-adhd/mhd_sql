@@ -92,7 +92,7 @@ i :resq 1
 
 
 matches: resq 1
-cp_ptr resq 1
+cp_ptr: resq 1
 idx: resq 1
 
 ck_body: resq 1
@@ -110,41 +110,32 @@ testname: resb 64
 section .text
 
 
-chekit:
+checkit:
     mov qword [matches], 0
     mov rax, page_buf
     add rax, 108
     mov [cp_ptr], rax
- 
     mov rax, [cellsn]
     mov [idx], rax
+.checkit_loop:
+    cmp qword [idx], 0
+    je .checkit_done
+    mov rbx, [cp_ptr]
+    movzx rax, byte [rbx]
+    shl rax, 8
+    movzx rdx, byte [rbx + 1]
+    or rax, rdx
+
+
+
     mov rdx, page_buf
     add rdx, rax
-    mov [cursor], rdx 
- 
-
-
-
-
-
-
-
-    call read_varint   
-    call read_varint  
-    mov rax, [cursor]
-    call read_varint
-    mov rax, [varint_value]
-    mov [header_size], rax
-    mov rax, [cursor]
-    mov [ck_body], rax
-    add qword [ck_body], [header_size]
+    mov [cursor], rdx
+    call read_varint 
     call read_varint         
-    lea rsi, [type_length]
-    call get_len
-    call read_varint        
-    lea rsi, [name_length]
-    call get_len
- 
+    mov rax, [cursor]
+    mov [header_start], rax 
+
 
 
 
@@ -156,19 +147,48 @@ chekit:
 
 
 
+
+
+
+
+
+
+
+    call read_varint          
+    mov rax, [varint_value]
+    mov [header_size], rax
+    mov rax, [header_start]
+    add rax, [header_size]
+    mov [ck_body], rax
+    call read_varint
+    lea rsi, [type_length]
+    call get_len
+    call read_varint
+    lea rsi, [name_length]
+    call get_len
     mov rsi, [ck_body]
     add rsi, [type_length]
     mov rdi, testname
     mov rcx, [name_length]
     rep movsb
-     mov rsi, testname
+    mov rsi, testname
     mov rdi, [argv2]
+
+
+
+
+
+
+
+
+
+
     mov rcx, [name_length]
     call strcmp_name
     test rax, rax
     jz .checkit_next
     inc qword [matches]
- checkit_next:
+.checkit_next:
     mov rax, [cp_ptr]
     add rax, 2
     mov [cp_ptr], rax
@@ -176,25 +196,8 @@ chekit:
     jmp .checkit_loop
 .checkit_done:
     mov rax, [matches]
-    cmp rax, 1  
+    cmp rax, 1
     ret
-
-
-
-
-
-
-
-
-
-.checkit_loop:
-    cmp qword [idx], 0
-    je .checkit_done
-    mov rbx, [cp_ptr]
-    movzx rax, byte [rbx]
-    shl rax, 8
-    movzx rdx, byte [rbx + 1]
-    or rax, rdx
 
 
 _start:
@@ -321,9 +324,13 @@ _start:
 
 
 no_table_missing:
-    mov rdi,1
-    mov rsi,tnf
-    mov rdx,tnf_len 
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, tnf
+    mov rdx, tnf_len
+    syscall
+    jmp exit
+
 read_column:
 
     mov rax, [header_cursor]
@@ -516,8 +523,6 @@ load_int_be:
     jnz .next_byte
 .done:
     ret
-
-
 
 
 

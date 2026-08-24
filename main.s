@@ -208,6 +208,10 @@ _start:
     mov rdx, 0
     mov rax, 2
     syscall
+    call checkthashi
+
+
+
     mov [fd], rax
 
     mov rdi, rax
@@ -244,6 +248,20 @@ _start:
     cmp al, 0x05
     je schema_interior
     jmp exit
+
+checkthashi:
+    cmp rax, 0
+    jl .invalidshi
+    ret
+
+.invalidshi:
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, file
+    mov rdx, file_len
+    syscall
+    jmp exit
+
 
 
 .schema_leaf:

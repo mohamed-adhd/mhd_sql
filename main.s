@@ -249,20 +249,6 @@ _start:
     je schema_interior
     jmp exit
 
-checkthashi:
-    cmp rax, 0
-    jl .invalidshi
-    ret
-
-.invalidshi:
-    mov rax, 1
-    mov rdi, 1
-    mov rsi, file
-    mov rdx, file_len
-    syscall
-    jmp exit
-
-
 
 .schema_leaf:
     movzx rax, byte [page_buf + 103]
@@ -337,6 +323,20 @@ checkthashi:
     call strcmp_name
     test rax, rax
     jnz FOUNDIT
+    jmp exit
+
+
+checkthashi:
+    cmp rax, 0
+    jl .invalidshi
+    ret
+
+.invalidshi:
+    mov rax, 1
+    mov rdi, 1
+    mov rsi, file
+    mov rdx, file_len
+    syscall
     jmp exit
 
 

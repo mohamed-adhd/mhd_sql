@@ -150,7 +150,7 @@ make clean
 
 <h2 align="center">Why I Built This</h2>
 
-yea this may be my straight up worst repo i ever made n just straight pain and terror , i dont like assembly at all yet it attracts me like a magnet , overall this rpeo helped me understand the sql schema on byte level , really enjoyed the header and records and the cells , still i stopped bcz i understood what i needed , anything more is an endless rabbit-hole for later , gg thou it was such a hellish experience
+yea this may be my straight up worst repo i ever made ... just straight pain and terror , i dont like assembly at all yet it attracts me like a magnet , overall this repo helped me understand the sql schema on byte level , really enjoyed the header and records and the cells , still i stopped bcz i understood what i needed , anything more is an endless rabbit-hole for later , gg thou it was such a hellish experience
 
 <h2 align="center">Developer Notes</h2>
 

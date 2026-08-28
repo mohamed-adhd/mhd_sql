@@ -70,7 +70,6 @@ exit(0)
 <h2 align="center">What It Does</h2>
 
 | Area | Details |
-|---|---|
 | File access | Opens the target file directly via the `open` syscall, no `fopen`/libc involved. |
 | Header parsing | Reads the 100-byte SQLite header to get page size, computes total page count via `fstat` + division. |
 | Schema lookup | Walks `sqlite_schema` (page 1) cell pointer array, decodes each record's varint header, and string-compares the table name against `argv[1]`. |
